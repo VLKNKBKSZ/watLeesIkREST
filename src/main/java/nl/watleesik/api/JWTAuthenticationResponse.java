@@ -1,6 +1,7 @@
 package nl.watleesik.api;
 
 public class JWTAuthenticationResponse {
+
 	private String accessToken;
 	private String tokenType = "Bearer";
 	

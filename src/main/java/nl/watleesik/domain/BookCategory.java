@@ -10,7 +10,7 @@ import javax.persistence.Id;
 @Entity
 @Data
 @NoArgsConstructor
-public class BookType {
+public class BookCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

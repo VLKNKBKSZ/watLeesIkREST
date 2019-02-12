@@ -2,6 +2,7 @@ package nl.watleesik.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import nl.watleesik.api.ApiResponse;
 import nl.watleesik.api.JWTAuthenticationResponse;
 import nl.watleesik.domain.Account;
@@ -33,6 +33,7 @@ public class LoginController {
 	private final AccountRoleRepository accountRoleRepository;
 	private final PasswordEncoder passwordEncoder;
 
+	@Autowired
 	public LoginController(AuthenticationManager authenticationManager, JWTTokenProvider jwtTokenProvider,
 			AccountRepository accountRepository, AccountRoleRepository accountRoleRepository,
 			PasswordEncoder passwordEncoder) {

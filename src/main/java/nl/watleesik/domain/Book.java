@@ -17,7 +17,7 @@ public class Book {
     private long isbn;
     
     @ManyToOne
-    private BookType bookType;
+    private BookCategory bookCategory;
     
     @ManyToOne
     @JoinColumn(name = "author_id")
