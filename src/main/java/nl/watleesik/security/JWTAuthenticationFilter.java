@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -17,10 +19,10 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import nl.watleesik.domain.Account;
 
-import static nl.watleesik.security.SecurityConstants.*;
-
-// TODO: Check this filetr for other/better implementations
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
+	
+	@Autowired
+	Environment environment;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 	private final JWTTokenProvider jwtTokenProvider;
@@ -54,9 +56,9 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 	}
 	
 	private String getTokenFromRequest(HttpServletRequest request) {
-		String token = request.getHeader(HEADER_STRING);
-		if (StringUtils.hasText(token) && token.startsWith(TOKEN_PREFIX)) {
-			return token.replace(TOKEN_PREFIX, "");
+		String token = request.getHeader(environment.getProperty("security.headerString"));
+		if (token != null && token.startsWith(environment.getProperty("security.tokenPrefix"))) {
+			return token.replace(environment.getProperty("security.tokenPrefix"), "");
 		}
 		return null;
 	}

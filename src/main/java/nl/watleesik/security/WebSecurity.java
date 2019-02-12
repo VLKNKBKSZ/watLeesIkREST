@@ -1,7 +1,9 @@
 package nl.watleesik.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -12,11 +14,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static nl.watleesik.security.SecurityConstants.*;
-
 @Configuration
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
+	
+	@Autowired
+	Environment environment;
 	
 	private final CustomUserDetailsService customUserDetailsService;
 	private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -38,8 +41,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		.csrf().disable()
 		.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
 		.and()
-		.authorizeRequests().antMatchers(SIGN_UP_URL).permitAll()
-		.antMatchers(REGISTER_URL).permitAll()
+		.authorizeRequests().antMatchers(environment.getProperty("security.signUpUrl")).permitAll()
+		.antMatchers(environment.getProperty("security.registerUrl")).permitAll()
 		.antMatchers("/account/**").hasRole("ADMIN")
 		.anyRequest().authenticated();
 

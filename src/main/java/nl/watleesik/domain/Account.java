@@ -23,17 +23,22 @@ public class Account implements UserDetails {
 	
 	@Column(unique = true, nullable = false)
 	private String email;
+	
 	private String password;
 	
 	@OneToOne
-	@JoinColumn(nullable = false)
 	private AccountRole accountRole;
+	
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<GrantedAuthority> roles = new ArrayList<>();
-		roles.add(new SimpleGrantedAuthority(accountRole.getRole()));
+		if (accountRole != null) {
+			roles.add(new SimpleGrantedAuthority(accountRole.getRole()));
+		} else {
+			roles.add(new SimpleGrantedAuthority("None"));
+		}
 		return roles;
 	}
 

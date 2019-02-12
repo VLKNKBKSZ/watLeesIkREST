@@ -13,15 +13,20 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    
     private long isbn;
-    @OneToOne
+    
+    @ManyToOne
     private BookType bookType;
+    
     @ManyToOne
     @JoinColumn(name = "author_id")
     private Author author;
+    
     private String title;
     private int publicationYear;
     private int pages;
+    
     @OneToMany
     private List<Rating> ratingList;
 

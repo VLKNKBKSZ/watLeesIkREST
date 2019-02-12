@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,6 +22,7 @@ import nl.watleesik.repository.AccountRoleRepository;
 import nl.watleesik.security.JWTTokenProvider;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:4200"})
 public class LoginController {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
@@ -55,13 +57,8 @@ public class LoginController {
 	@PostMapping("/account/register")
 	public ResponseEntity<ApiResponse<Account>> register(@RequestBody Account account) {
 		if (accountRepository.findAccountByEmail(account.getEmail()) != null) {
-			return new ResponseEntity<>(new ApiResponse<Account>(400, "Email address already registered", null), 
-					HttpStatus.BAD_REQUEST);
-		}
-		// TODO: REQUIRES CHANGE!! Default role is now Admin :-)
-		if (account.getAccountRole() == null) {
-			// TODO: need different way to handle default role
-			account.setAccountRole(accountRoleRepository.findAccountRoleByRole("Admin"));
+			return new ResponseEntity<>(new ApiResponse<Account>(409, "Email address already registered", account), 
+					HttpStatus.CONFLICT);
 		}
 		account.setPassword(passwordEncoder.encode(account.getPassword()));
 		accountRepository.save(account);
