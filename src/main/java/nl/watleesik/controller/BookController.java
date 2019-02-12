@@ -15,9 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping(path = "/book")
+@RequestMapping(path = "book")
 @CrossOrigin(origins = "*")
-
 public class BookController {
 
     private BookRepository bookRepository;
@@ -31,7 +30,7 @@ public class BookController {
         this.bookCategoryRepository = bookCategoryRepository;
     }
 
-    @GetMapping("/booktypes")
+    @GetMapping("/categories")
     public ResponseEntity<List<BookCategory>> getAllBookTypes () {
         return new ResponseEntity<>((bookCategoryRepository.findAll()), HttpStatus.OK);
     }
@@ -65,12 +64,11 @@ public class BookController {
 
         Book newBook = new Book();
 
-        BookCategory bookCategoryNew = new BookCategory();
-        bookCategoryNew.setName(book.getBookCategory().getName());
-        BookCategory bookTypeDB = bookCategoryRepository.save(bookCategoryNew);
+        BookCategory bookTypeDB = bookCategoryRepository.findBookCategoryByName(book.getBookCategory().getName());
+        newBook.setBookCategory(bookTypeDB);
 
         newBook.setAuthor(author);
-        newBook.setBookCategory(bookTypeDB);
+
         newBook.setTitle(book.getTitle());
         newBook.setPublicationYear(book.getPublicationYear());
         newBook.setPages(book.getPages());

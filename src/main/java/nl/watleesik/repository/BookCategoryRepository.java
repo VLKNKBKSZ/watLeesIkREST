@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BookCategoryRepository extends JpaRepository<BookCategory, Long> {
 
-    public Book findBookTypeByName(String name);
+    public BookCategory findBookCategoryByName(String name);
 
 }
