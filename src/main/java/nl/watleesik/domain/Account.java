@@ -37,7 +37,7 @@ public class Account implements UserDetails {
 		if (accountRole != null) {
 			roles.add(new SimpleGrantedAuthority(accountRole.getRole()));
 		} else {
-			roles.add(new SimpleGrantedAuthority("None"));
+			roles.add(new SimpleGrantedAuthority("ROLE_None"));
 		}
 		return roles;
 	}

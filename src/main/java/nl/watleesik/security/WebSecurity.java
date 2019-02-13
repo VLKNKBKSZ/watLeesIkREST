@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -32,7 +33,6 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		this.jwtTokenProvider = jwtTokenProvider;
 	}
 
-	// TODO: This method needs to be fine-tuned later on
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
@@ -41,13 +41,16 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		.csrf().disable()
 		.exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
 		.and()
-		.authorizeRequests().antMatchers(environment.getProperty("security.signUpUrl")).permitAll()
+		.sessionManagement()
+		.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+		.and()
+		.authorizeRequests()
+		.antMatchers(environment.getProperty("security.signUpUrl")).permitAll()
 		.antMatchers(environment.getProperty("security.registerUrl")).permitAll()
-		.antMatchers("/account/**").hasRole("ADMIN")
-		.anyRequest().authenticated();
-
-	// Add our custom JWT authentication filter		
-	http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+		.antMatchers("/book/**").hasRole("None")
+		.anyRequest().authenticated()
+		.and()
+		.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 	}
 	
 	@Override

@@ -14,7 +14,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import nl.watleesik.domain.Account;
@@ -39,8 +38,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 		
 		try {
 			String token = getTokenFromRequest(request);
-			
-			if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)) {
+			if (token != null && jwtTokenProvider.validateToken(token)) {
 				String email = jwtTokenProvider.getEmailFromToken(token);
 				Account account = (Account) customUserDetailsService.loadUserByUsername(email);
 				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
