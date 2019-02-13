@@ -18,7 +18,7 @@ import nl.watleesik.api.ApiResponse;
 import nl.watleesik.api.JWTAuthenticationResponse;
 import nl.watleesik.domain.Account;
 import nl.watleesik.repository.AccountRepository;
-import nl.watleesik.repository.AccountRoleRepository;
+//import nl.watleesik.repository.AccountRoleRepository;
 import nl.watleesik.security.JWTTokenProvider;
 
 @RestController
@@ -30,17 +30,16 @@ public class LoginController {
 	private final AuthenticationManager authenticationManager;
 	private final JWTTokenProvider jwtTokenProvider;
 	private final AccountRepository accountRepository;
-	private final AccountRoleRepository accountRoleRepository;
+//	private final AccountRoleRepository accountRoleRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	@Autowired
 	public LoginController(AuthenticationManager authenticationManager, JWTTokenProvider jwtTokenProvider,
-			AccountRepository accountRepository, AccountRoleRepository accountRoleRepository,
-			PasswordEncoder passwordEncoder) {
+			AccountRepository accountRepository, PasswordEncoder passwordEncoder) {
 		this.authenticationManager = authenticationManager;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.accountRepository = accountRepository;
-		this.accountRoleRepository = accountRoleRepository;
+//		this.accountRoleRepository = accountRoleRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
 

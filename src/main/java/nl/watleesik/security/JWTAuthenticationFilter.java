@@ -9,19 +9,23 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import lombok.extern.slf4j.Slf4j;
 import nl.watleesik.domain.Account;
 
+@Slf4j
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 	
-	@Autowired
-	Environment environment;
+	@Value("${security.tokenPrefix}")
+	private String tokenPrefix;
+	
+	@Value("${security.headerString}")
+	private String headerString;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(JWTAuthenticationFilter.class);
 	private final JWTTokenProvider jwtTokenProvider;
@@ -54,9 +58,11 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 	}
 	
 	private String getTokenFromRequest(HttpServletRequest request) {
-		String token = request.getHeader(environment.getProperty("security.headerString"));
-		if (token != null && token.startsWith(environment.getProperty("security.tokenPrefix"))) {
-			return token.replace(environment.getProperty("security.tokenPrefix"), "");
+		String token = request.getHeader(headerString);
+		log.debug("HEADER: {}", headerString);
+		log.debug("TOKEN: {}", token);
+		if (token != null && token.startsWith(tokenPrefix)) {
+			return token.replace(tokenPrefix, "");
 		}
 		return null;
 	}
