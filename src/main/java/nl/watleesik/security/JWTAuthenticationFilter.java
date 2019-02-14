@@ -59,8 +59,6 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 	
 	private String getTokenFromRequest(HttpServletRequest request) {
 		String token = request.getHeader(headerString);
-		log.debug("HEADER: {}", headerString);
-		log.debug("TOKEN: {}", token);
 		if (token != null && token.startsWith(tokenPrefix)) {
 			return token.replace(tokenPrefix, "");
 		}

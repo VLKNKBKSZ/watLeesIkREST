@@ -51,6 +51,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		.antMatchers(registerUrl).permitAll()
 		.antMatchers("/book/**").hasRole("USER")
 		.antMatchers("/account/**").hasRole("USER")
+		.antMatchers("/profile/**").hasRole("USER")
 		.anyRequest().authenticated()
 		.and()
 		.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

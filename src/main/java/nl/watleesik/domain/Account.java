@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -26,9 +29,10 @@ public class Account implements UserDetails {
 	
 	private String password;	
 	private String role = AccountRole.USER;
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
+	private LocalDateTime createdOn;
+	private LocalDateTime updatedOn;
 
+	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<GrantedAuthority> authority = new ArrayList<>();
 		authority.add(new SimpleGrantedAuthority("ROLE_" + role));

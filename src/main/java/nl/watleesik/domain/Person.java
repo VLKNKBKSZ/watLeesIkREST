@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class Person {
     private String name;
     private String middleName;
     private String lastName;
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedOn;
     
     @ManyToMany
     @JoinTable(name = "person_book", joinColumns = @JoinColumn(name =
