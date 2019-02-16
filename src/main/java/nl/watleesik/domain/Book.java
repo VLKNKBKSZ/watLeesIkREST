@@ -16,10 +16,10 @@ public class Book {
     
     private long isbn;
     
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     private BookCategory bookCategory;
     
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "author_id")
     private Author author;
     
