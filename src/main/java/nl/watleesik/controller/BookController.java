@@ -7,10 +7,12 @@ import nl.watleesik.domain.BookCategory;
 import nl.watleesik.repository.AuthorRepository;
 import nl.watleesik.repository.BookCategoryRepository;
 import nl.watleesik.repository.BookRepository;
+import nl.watleesik.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
@@ -21,59 +23,44 @@ public class BookController {
     private BookRepository bookRepository;
     private AuthorRepository authorRepository;
     private BookCategoryRepository bookCategoryRepository;
+    private BookService bookService;
 
     @Autowired
-    public BookController (BookRepository bookRepository, AuthorRepository authorRepository, BookCategoryRepository bookCategoryRepository){
+    public BookController(BookRepository bookRepository, AuthorRepository authorRepository, BookCategoryRepository bookCategoryRepository, BookService bookService) {
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
         this.bookCategoryRepository = bookCategoryRepository;
+        this.bookService = bookService;
     }
 
     @GetMapping("/categories")
-    public ResponseEntity<List<BookCategory>> getAllBookTypes () {
+    public ResponseEntity<List<BookCategory>> getAllBookTypes() {
         return new ResponseEntity<>((bookCategoryRepository.findAll()), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ApiResponse> createBook(@RequestBody Book book) {
 
-        if (bookRepository.findBookByTitle(book.getTitle()) != null) {
-            return new ResponseEntity<>(new ApiResponse(409, "Er bestaat al een boek met deze titel", null), HttpStatus.BAD_REQUEST);
-        }
-
         Author authorDB = authorRepository.findAuthorByLastNameAndName(book.getAuthor().getLastName(), book.getAuthor().getName());
 
+        // check if that author already exist or nog
         if (authorDB == null) {
-
-            Author author = new Author();
-            author.setName(book.getAuthor().getName());
-            author.setMiddleName(book.getAuthor().getMiddleName());
-            author.setLastName(book.getAuthor().getLastName());
-
-            Author authorNewDB = authorRepository.save(author);
-
-            return new ResponseEntity<>(new ApiResponse(200, "Boek is toegevoegd aan de collectie met een nieuwe auteur", bookRepository.save(creatingNewBook(book, authorNewDB))), HttpStatus.CREATED);
+            return new ResponseEntity<>(new ApiResponse(409, "Maak is een auteur aan met deze naam voordat je een boek wil toevoegen", null), HttpStatus.BAD_REQUEST);
         }
 
-        return new ResponseEntity<>(new ApiResponse(200, "Boek is toegevoegd aan de collectie met een bestaande auteur", bookRepository.save(creatingNewBook(book, authorDB))), HttpStatus.CREATED);
+        List<Book> bookDB = bookRepository.findBookByTitle(book.getTitle());
 
-    }
+        // loops true the booklist to see if the author already has that book saved
+        for (Book bookList : bookDB) {
+            if (bookList != null) {
+                if (bookList.getAuthor().getLastName().equals(authorDB.getLastName()) && bookList.getAuthor().getName().equals(authorDB.getName())) {
+                    return new ResponseEntity<>(new ApiResponse(409, "Het boek dat je wil toevoegen bestaat al voor deze auteur", book), HttpStatus.CONFLICT);
+                }
+            }
+        }
 
-    public Book creatingNewBook(Book book, Author author) {
-
-        Book newBook = new Book();
-
-        BookCategory bookTypeDB = bookCategoryRepository.findBookCategoryByName(book.getBookCategory().getName());
-        newBook.setBookCategory(bookTypeDB);
-
-        newBook.setAuthor(author);
-
-        newBook.setTitle(book.getTitle());
-        newBook.setPublicationYear(book.getPublicationYear());
-        newBook.setPages(book.getPages());
-        newBook.setIsbn(book.getIsbn());
-
-        return newBook;
+        //makes a new book for an already existing author
+        return new ResponseEntity<>(new ApiResponse(200, "Er is een boek aangemaakt met een schrijver die al bestond in de database", bookRepository.save(bookService.creatingNewBook(book, book.getAuthor()))), HttpStatus.CREATED);
     }
 
 }

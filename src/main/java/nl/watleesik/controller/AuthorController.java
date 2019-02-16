@@ -3,6 +3,7 @@ package nl.watleesik.controller;
 import nl.watleesik.api.ApiResponse;
 import nl.watleesik.domain.Author;
 import nl.watleesik.repository.AuthorRepository;
+import nl.watleesik.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +15,12 @@ import org.springframework.web.bind.annotation.*;
 public class AuthorController {
 
     private AuthorRepository authorRepository;
+    private AuthorService authorService;
 
     @Autowired
-    public AuthorController (AuthorRepository authorRepository) {
+    public AuthorController(AuthorRepository authorRepository, AuthorService authorService) {
         this.authorRepository = authorRepository;
+        this.authorService = authorService;
     }
 
     @PostMapping
@@ -25,16 +28,10 @@ public class AuthorController {
 
         Author authorDB = authorRepository.findAuthorByLastNameAndName(author.getLastName(), author.getName());
 
-        if (authorDB != null) {
+        if (authorDB != null && (authorDB.getName().equals(author.getName()) && authorDB.getLastName().equals(author.getLastName()))) {
 
             return new ResponseEntity<>(new ApiResponse(409, "Er bestaat al een auteur in de database met deze naam!", null), HttpStatus.CONFLICT);
         }
-
-        Author authorNew = new Author();
-        authorNew.setName(author.getName());
-        authorNew.setMiddleName(author.getMiddleName());
-        authorNew.setLastName(author.getLastName());
-        authorRepository.save(authorNew);
-        return new ResponseEntity<>(new ApiResponse(200, "Nieuwe auteur is toegevoegd aan de collectie", authorRepository.save(authorNew)), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(200, "Nieuwe auteur is toegevoegd aan de collectie", authorRepository.save(authorService.createAuthor(author))), HttpStatus.CREATED);
     }
 }
