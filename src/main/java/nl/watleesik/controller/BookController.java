@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -53,7 +52,7 @@ public class BookController {
         // loops true the booklist to see if the author already has that book saved
         for (Book bookList : bookDB) {
             if (bookList != null) {
-                if (bookList.getAuthor().getLastName().equals(authorDB.getLastName()) && bookList.getAuthor().getName().equals(authorDB.getName())) {
+                if (bookList.getAuthor().equals(authorDB)) {
                     return new ResponseEntity<>(new ApiResponse(409, "Het boek dat je wil toevoegen bestaat al voor deze auteur", book), HttpStatus.CONFLICT);
                 }
             }

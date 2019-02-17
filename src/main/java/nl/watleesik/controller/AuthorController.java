@@ -28,7 +28,7 @@ public class AuthorController {
 
         Author authorDB = authorRepository.findAuthorByLastNameAndName(author.getLastName(), author.getName());
 
-        if (authorDB != null && (authorDB.getName().equals(author.getName()) && authorDB.getLastName().equals(author.getLastName()))) {
+        if (authorDB != null && (authorDB.equals(author))) {
 
             return new ResponseEntity<>(new ApiResponse(409, "Er bestaat al een auteur in de database met deze naam!", null), HttpStatus.CONFLICT);
         }
