@@ -27,6 +27,10 @@ public class Account implements UserDetails {
 	@Column(unique = true, nullable = false)
 	private String email;
 	
+	@OneToOne
+	@MapsId
+	private Person person;
+	
 	private String password;	
 	private String role = AccountRole.USER;
 	private LocalDateTime createdOn;

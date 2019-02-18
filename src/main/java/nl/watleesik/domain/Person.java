@@ -18,10 +18,6 @@ public class Person {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     
-    @OneToOne(fetch=FetchType.LAZY)
-    @JoinColumn(name = "account_id", nullable = false)
-    private Account account;
-    
     @OneToMany
     @JoinColumn(name = "address_id")
     private List<Address> addressList;

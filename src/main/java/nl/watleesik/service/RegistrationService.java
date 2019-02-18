@@ -24,15 +24,15 @@ public class RegistrationService {
 		this.accountRepository = accountRepository;
 	}
 
-	public Person register(Account account) {
+	public Account register(Account account) {
 		
 		account.setPassword(passwordEncoder.encode(account.getPassword()));
 		account.setCreatedOn(LocalDateTime.now());
 		account.setUpdatedOn(LocalDateTime.now());
-		accountRepository.save(account);
-		
 		Person person = new Person();
-		person.setAccount(account);
-		return personRepository.save(person);
+		personRepository.save(person);
+		account.setPerson(person);
+		return accountRepository.save(account);
+		
 	}
 }

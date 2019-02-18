@@ -58,9 +58,9 @@ public class LoginController {
 			return new ResponseEntity<>(new ApiResponse<>(409, "Email address already registered", null), 
 					HttpStatus.CONFLICT);
 		}
-		Person person = registrationService.register(account);
+		Account savedAccount = registrationService.register(account);
 
-		return new ResponseEntity<>(new ApiResponse<Person>(200, "Account succesfully registered", person), 
+		return new ResponseEntity<>(new ApiResponse<Person>(200, "Account succesfully registered", savedAccount.getPerson()), 
 				HttpStatus.OK);
 	}
 }
