@@ -1,27 +1,20 @@
 package nl.watleesik.api;
 
+import lombok.Data;
+
+@Data
 public class JWTAuthenticationResponse {
 
 	private String accessToken;
 	private String tokenType = "Bearer";
+	private String email;
+	private String role;
+	private long profileId;
 	
-	public JWTAuthenticationResponse(String accessToken) {
+	public JWTAuthenticationResponse(String accessToken, String email, String role, long profileId) {
 		this.accessToken = accessToken;
-	}
-
-	public String getAccessToken() {
-		return accessToken;
-	}
-
-	public void setAccessToken(String accessToken) {
-		this.accessToken = accessToken;
-	}
-
-	public String getTokenType() {
-		return tokenType;
-	}
-
-	public void setTokenType(String tokenType) {
-		this.tokenType = tokenType;
+		this.email = email;
+		this.role = role;
+		this.profileId = profileId;
 	}
 }

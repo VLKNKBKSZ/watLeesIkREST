@@ -6,7 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import nl.watleesik.domain.Account;
-import nl.watleesik.domain.Person;
+import nl.watleesik.domain.Profile;
 import nl.watleesik.repository.AccountRepository;
 import nl.watleesik.repository.PersonRepository;
 
@@ -29,9 +29,9 @@ public class RegistrationService {
 		account.setPassword(passwordEncoder.encode(account.getPassword()));
 		account.setCreatedOn(LocalDateTime.now());
 		account.setUpdatedOn(LocalDateTime.now());
-		Person person = new Person();
-		personRepository.save(person);
-		account.setPerson(person);
+		Profile profile = new Profile();
+		personRepository.save(profile);
+		account.setProfile(profile);
 		return accountRepository.save(account);
 		
 	}

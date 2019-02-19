@@ -29,7 +29,7 @@ public class Account implements UserDetails {
 	
 	@OneToOne
 	@MapsId
-	private Person person;
+	private Profile profile;
 	
 	private String password;	
 	private String role = AccountRole.USER;

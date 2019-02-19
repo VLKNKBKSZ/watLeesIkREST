@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import nl.watleesik.api.ApiResponse;
-import nl.watleesik.domain.Person;
+import nl.watleesik.domain.Profile;
 import nl.watleesik.repository.PersonRepository;
 
 @RestController
@@ -26,13 +26,13 @@ public class PersonController {
 	}
 
 	@GetMapping("/profile-update/{id}")
-	public Person findPersonById(@PathVariable String id) {
+	public Profile findPersonById(@PathVariable String id) {
 		return personRepository.findById(Long.parseLong(id)).get();
 	}
 	
 	@PutMapping("/profile-update")
-	public ResponseEntity<ApiResponse<?>> updatePerson(@RequestBody Person person) {
-		Person updatedPerson = personRepository.save(person);
-		return new ResponseEntity<>(new ApiResponse<Person>(200, "Profile is updated", updatedPerson), HttpStatus.OK);
+	public ResponseEntity<ApiResponse<?>> updatePerson(@RequestBody Profile person) {
+		Profile updatedPerson = personRepository.save(person);
+		return new ResponseEntity<>(new ApiResponse<Profile>(200, "Profile is updated", updatedPerson), HttpStatus.OK);
 	}
 }

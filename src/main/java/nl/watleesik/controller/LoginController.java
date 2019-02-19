@@ -16,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 import nl.watleesik.api.ApiResponse;
 import nl.watleesik.api.JWTAuthenticationResponse;
 import nl.watleesik.domain.Account;
-import nl.watleesik.domain.Person;
+import nl.watleesik.domain.Profile;
 import nl.watleesik.repository.AccountRepository;
 import nl.watleesik.security.JWTTokenProvider;
 import nl.watleesik.service.RegistrationService;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:4200"})
+@CrossOrigin(origins = "*")
 public class LoginController {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
@@ -46,21 +46,27 @@ public class LoginController {
 		
 		Authentication authentication = authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(account.getEmail(), account.getPassword()));
-		LOG.debug("AuthenticationManager returns {}", authentication);
 		SecurityContextHolder.getContext().setAuthentication(authentication);
+		
 		String token = jwtTokenProvider.generateToken(authentication);
-		return ResponseEntity.ok(new JWTAuthenticationResponse(token));
+		Account authenticatedAccount = accountRepository.findAccountByEmail(account.getEmail());
+		JWTAuthenticationResponse response = new JWTAuthenticationResponse(
+				token, 
+				authenticatedAccount.getEmail(), 
+				authenticatedAccount.getRole(), 
+				authenticatedAccount.getProfile().getId());
+		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping("/account/register")
-	public ResponseEntity<ApiResponse<Person>> register(@RequestBody Account account) {
+	public ResponseEntity<ApiResponse<Profile>> register(@RequestBody Account account) {
 		if (accountRepository.findAccountByEmail(account.getEmail()) != null) {
 			return new ResponseEntity<>(new ApiResponse<>(409, "Email address already registered", null), 
 					HttpStatus.CONFLICT);
 		}
 		Account savedAccount = registrationService.register(account);
 
-		return new ResponseEntity<>(new ApiResponse<Person>(200, "Account succesfully registered", savedAccount.getPerson()), 
+		return new ResponseEntity<>(new ApiResponse<Profile>(200, "Account succesfully registered", savedAccount.getProfile()), 
 				HttpStatus.OK);
 	}
 }
