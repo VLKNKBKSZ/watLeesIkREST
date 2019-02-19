@@ -12,27 +12,27 @@ import org.springframework.web.bind.annotation.RestController;
 
 import nl.watleesik.api.ApiResponse;
 import nl.watleesik.domain.Profile;
-import nl.watleesik.repository.PersonRepository;
+import nl.watleesik.repository.ProfileRepository;
 
 @RestController
 @RequestMapping(path = "profile")
 @CrossOrigin(origins = {"http://localhost:4200"})
-public class PersonController {
+public class ProfileController {
 	
-	private final PersonRepository personRepository;
+	private final ProfileRepository profileRepository;
 
-	public PersonController(PersonRepository personRepository) {
-		this.personRepository = personRepository;
+	public ProfileController(ProfileRepository profileRepository) {
+		this.profileRepository = profileRepository;
 	}
 
 	@GetMapping("/profile-update/{id}")
-	public Profile findPersonById(@PathVariable String id) {
-		return personRepository.findById(Long.parseLong(id)).get();
+	public Profile findProfileById(@PathVariable String id) {
+		return profileRepository.findById(Long.parseLong(id)).get();
 	}
 	
 	@PutMapping("/profile-update")
-	public ResponseEntity<ApiResponse<?>> updatePerson(@RequestBody Profile person) {
-		Profile updatedPerson = personRepository.save(person);
-		return new ResponseEntity<>(new ApiResponse<Profile>(200, "Profile is updated", updatedPerson), HttpStatus.OK);
+	public ResponseEntity<ApiResponse<?>> updateProfile(@RequestBody Profile profile) {
+		Profile updatedProfile = profileRepository.save(profile);
+		return new ResponseEntity<>(new ApiResponse<Profile>(200, "Profile is updated", updatedProfile), HttpStatus.OK);
 	}
 }
