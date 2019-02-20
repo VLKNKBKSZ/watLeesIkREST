@@ -50,7 +50,7 @@ public class BookController {
         if(newBook == null){
             return new ResponseEntity<>(new ApiResponse(409, "Het boek dat je wil toevoegen bestaat al voor deze auteur", null), HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(new ApiResponse(200, "Er is een nieuw boek toegevoegd aan de database ", bookRepository.save(newBook)), HttpStatus.CREATED);
+        return new ResponseEntity<>(new ApiResponse(200, "Er is een nieuw boek toegevoegd aan de database ", newBook), HttpStatus.CREATED);
     }
 
 }
