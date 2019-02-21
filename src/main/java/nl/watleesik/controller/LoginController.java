@@ -50,23 +50,24 @@ public class LoginController {
 		
 		String token = jwtTokenProvider.generateToken(authentication);
 		Account authenticatedAccount = accountRepository.findAccountByEmail(account.getEmail());
-		JWTAuthenticationResponse response = new JWTAuthenticationResponse(
-				token, 
-				authenticatedAccount.getEmail(), 
-				authenticatedAccount.getRole(), 
-				authenticatedAccount.getProfile().getId());
-		return ResponseEntity.ok(response);
+		JWTAuthenticationResponse jwtResponse = new JWTAuthenticationResponse(
+													token, 
+													authenticatedAccount.getEmail(), 
+													authenticatedAccount.getRole());
+		return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
 	}
 
 	@PostMapping("/account/register")
-	public ResponseEntity<ApiResponse<Profile>> register(@RequestBody Account account) {
+	public ResponseEntity<ApiResponse<?>> register(@RequestBody Account account) {
+		ApiResponse<?> response;
 		if (accountRepository.findAccountByEmail(account.getEmail()) != null) {
-			return new ResponseEntity<>(new ApiResponse<>(409, "Email address already registered", null), 
-					HttpStatus.CONFLICT);
+			response = new ApiResponse<>(409, "Emailadres bestaat al", null);
+			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
 		}
+		
 		Account savedAccount = registrationService.register(account);
+		response = new ApiResponse<Profile>(200, "Account succesvol geregistreerd", savedAccount.getProfile());
+		return new ResponseEntity<>(response, HttpStatus.OK);
 
-		return new ResponseEntity<>(new ApiResponse<Profile>(200, "Account succesfully registered", savedAccount.getProfile()), 
-				HttpStatus.OK);
 	}
 }

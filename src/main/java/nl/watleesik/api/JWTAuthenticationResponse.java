@@ -9,12 +9,10 @@ public class JWTAuthenticationResponse {
 	private String tokenType = "Bearer";
 	private String email;
 	private String role;
-	private long profileId;
 	
-	public JWTAuthenticationResponse(String accessToken, String email, String role, long profileId) {
+	public JWTAuthenticationResponse(String accessToken, String email, String role) {
 		this.accessToken = accessToken;
 		this.email = email;
 		this.role = role;
-		this.profileId = profileId;
 	}
 }
