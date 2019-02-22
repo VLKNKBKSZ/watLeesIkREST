@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class Profile {
     @JoinColumn(name = "address_id")
     private List<Address> addressList;
     
-    private LocalDateTime dayOfBirth;
+    private LocalDate dayOfBirth;
     private String name;
     private String middleName;
     private String lastName;
