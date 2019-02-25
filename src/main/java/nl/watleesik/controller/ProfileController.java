@@ -1,6 +1,7 @@
 package nl.watleesik.controller;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,6 +43,7 @@ public class ProfileController {
 	
 	@PutMapping("/update")
 	public ResponseEntity<ApiResponse<?>> updateProfile(@RequestBody Profile profile, Principal principal) {
+		profile.setUpdatedOn(LocalDateTime.now());
 		Profile updatedProfile = profileRepository.save(profile);
 		ApiResponse<?> response = new ApiResponse<Profile>(200, "Profiel is aangepast", updatedProfile);
 		return new ResponseEntity<>(response, HttpStatus.OK);

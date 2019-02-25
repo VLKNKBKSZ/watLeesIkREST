@@ -19,9 +19,11 @@ public class Profile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     
-    @OneToMany
-    @JoinColumn(name = "address_id")
-    private List<Address> addressList;
+//    @OneToMany
+//    @JoinColumn(name = "address_id")
+//    private List<Address> addressList;
+    @OneToOne(cascade=CascadeType.ALL)
+    Address address;
     
     private LocalDate dayOfBirth;
     private String name;
