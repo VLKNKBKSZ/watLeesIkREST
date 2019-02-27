@@ -31,12 +31,12 @@ public class AccountController {
 		this.registrationService = registrationService;
 	}
 
-	@GetMapping("/account-list")
+	@GetMapping("/list")
 	public ResponseEntity<List<Account>> getAccountList() {
 		return new ResponseEntity<>(accountRepository.findAll(), HttpStatus.OK);
 	}
 	
-	@PostMapping("/account-create")
+	@PostMapping("/create")
 	public ResponseEntity<ApiResponse<?>> createAccount(@RequestBody Account account) {
 		ApiResponse<?> response;
 		if (accountRepository.findAccountByEmail(account.getEmail()) != null) {
@@ -46,5 +46,17 @@ public class AccountController {
 		Account createdAccount = registrationService.register(account);
 		response = new ApiResponse<Profile>(200, "Account succesvol gecreeerd", createdAccount.getProfile());
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	@PostMapping("/delete")
+	public ResponseEntity<ApiResponse<?>> deleteAccount(@RequestBody Account account) {
+		ApiResponse<?> response;
+		if (registrationService.deleteAccount(account)) {
+			response = new ApiResponse<>(200, "Account succesvol verwijderd", null);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} else {
+			response = new ApiResponse<>(409, "Kon account niet verwijderen", null);
+			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+		}
 	}
 }

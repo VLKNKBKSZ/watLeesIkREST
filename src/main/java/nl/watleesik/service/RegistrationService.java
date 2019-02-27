@@ -42,4 +42,15 @@ public class RegistrationService {
 		account.setProfile(profile);
 		return accountRepository.save(account);		
 	}
+	
+	public boolean deleteAccount(Account account) {
+		if (account != null) {
+			accountRepository.delete(account);
+			profileRepository.delete(account.getProfile());
+			addressRepository.delete(account.getProfile().getAddress());			
+			return true;
+		} else return false;
+		
+		
+	}
 }
