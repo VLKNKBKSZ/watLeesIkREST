@@ -31,10 +31,16 @@ public class Account implements UserDetails {
 	@MapsId
 	private Profile profile;
 	
-	private String password;	
-	private String role = AccountRole.USER;
+	@Column(length = 100)
+	private String password;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(length = 15, nullable = false)
+	private AccountRole role = AccountRole.USER;
+	
 	private LocalDateTime createdOn;
 	private LocalDateTime updatedOn;
+	private LocalDateTime lastLogin;
 
 	@JsonIgnore
 	public Collection<? extends GrantedAuthority> getAuthorities() {

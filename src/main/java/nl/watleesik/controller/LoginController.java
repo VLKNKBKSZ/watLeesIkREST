@@ -1,5 +1,7 @@
 package nl.watleesik.controller;
 
+import java.time.LocalDateTime;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,8 @@ public class LoginController {
 													token, 
 													authenticatedAccount.getEmail(), 
 													authenticatedAccount.getRole());
+		authenticatedAccount.setLastLogin(LocalDateTime.now());
+		accountRepository.save(authenticatedAccount);
 		return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
 	}
 
