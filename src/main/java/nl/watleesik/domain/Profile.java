@@ -36,5 +36,8 @@ public class Profile {
             "person_id"), inverseJoinColumns = @JoinColumn(name = "book_id"))
     private List<Book> bookList;
 
+    public void addBookToBookList(Book book) {
+        this.bookList.add(book);
+    }
 
 }

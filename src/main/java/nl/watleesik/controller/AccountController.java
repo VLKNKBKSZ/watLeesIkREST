@@ -25,7 +25,8 @@ public class AccountController {
 
 	private final AccountRepository accountRepository;
 	private final AccountService accountService;
-	
+
+	@Autowired
 	public AccountController(AccountRepository accountRepository, AccountService accountService) {
 		this.accountRepository = accountRepository;
 		this.accountService = accountService;
@@ -35,7 +36,7 @@ public class AccountController {
 	public ResponseEntity<List<Account>> getAccountList() {
 		return new ResponseEntity<>(accountRepository.findAll(), HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/create")
 	public ResponseEntity<ApiResponse<?>> createAccount(@RequestBody Account account) {
 		ApiResponse<?> response;
@@ -47,7 +48,7 @@ public class AccountController {
 		response = new ApiResponse<Profile>(200, "Account succesvol gecreeerd", createdAccount.getProfile());
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/delete")
 	public ResponseEntity<ApiResponse<?>> deleteAccount(@RequestBody Account account) {
 		ApiResponse<?> response;

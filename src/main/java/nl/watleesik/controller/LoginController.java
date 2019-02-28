@@ -26,7 +26,7 @@ import nl.watleesik.service.AccountService;
 @RestController
 @CrossOrigin(origins = "*")
 public class LoginController {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
 
 	private final AuthenticationManager authenticationManager;
@@ -36,7 +36,7 @@ public class LoginController {
 
 	@Autowired
 	public LoginController(AuthenticationManager authenticationManager, JWTTokenProvider jwtTokenProvider,
-			AccountRepository accountRepository, AccountService accountService) {
+						   AccountRepository accountRepository, AccountService accountService) {
 		this.authenticationManager = authenticationManager;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.accountRepository = accountRepository;
@@ -45,17 +45,17 @@ public class LoginController {
 
 	@PostMapping("/login")
 	public ResponseEntity<JWTAuthenticationResponse> authenticateAccount(@RequestBody Account account) {
-		
+
 		Authentication authentication = authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(account.getEmail(), account.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
+
 		String token = jwtTokenProvider.generateToken(authentication);
 		Account authenticatedAccount = accountRepository.findAccountByEmail(account.getEmail());
 		JWTAuthenticationResponse jwtResponse = new JWTAuthenticationResponse(
-													token, 
-													authenticatedAccount.getEmail(), 
-													authenticatedAccount.getRole());
+				token,
+				authenticatedAccount.getEmail(),
+				authenticatedAccount.getRole());
 		authenticatedAccount.setLastLogin(LocalDateTime.now());
 		accountRepository.save(authenticatedAccount);
 		return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
@@ -68,7 +68,7 @@ public class LoginController {
 			response = new ApiResponse<>(409, "Emailadres bestaat al", null);
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
 		}
-		
+
 		Account savedAccount = accountService.register(account);
 		response = new ApiResponse<Profile>(200, "Account succesvol geregistreerd", savedAccount.getProfile());
 		return new ResponseEntity<>(response, HttpStatus.OK);

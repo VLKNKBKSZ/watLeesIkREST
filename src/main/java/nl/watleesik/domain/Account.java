@@ -49,6 +49,7 @@ public class Account implements UserDetails {
 		return authority;		
 	}
 
+
 	public String getUsername() {
 		return email;
 	}

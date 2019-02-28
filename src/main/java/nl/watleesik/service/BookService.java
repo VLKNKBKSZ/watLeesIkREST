@@ -1,15 +1,16 @@
 package nl.watleesik.service;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.watleesik.domain.Author;
-import nl.watleesik.domain.Book;
-import nl.watleesik.domain.BookCategory;
+import nl.watleesik.domain.*;
+import nl.watleesik.repository.AccountRepository;
 import nl.watleesik.repository.BookCategoryRepository;
 import nl.watleesik.repository.BookRepository;
+import nl.watleesik.repository.ProfileRepository;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 
 @Slf4j
@@ -19,14 +20,20 @@ public class BookService {
     private BookCategoryRepository bookCategoryRepository;
     private AuthorService authorService;
     private BookRepository bookRepository;
+    private ProfileRepository profileRepository;
+    private AccountRepository accountRepository;
 
     @Autowired
     public BookService(BookCategoryRepository bookCategoryRepository,
                        AuthorService authorService,
-                       BookRepository bookRepository) {
+                       BookRepository bookRepository,
+                       ProfileRepository profileRepository,
+                       AccountRepository accountRepository) {
         this.authorService = authorService;
         this.bookCategoryRepository = bookCategoryRepository;
         this.bookRepository = bookRepository;
+        this.profileRepository = profileRepository;
+        this.accountRepository = accountRepository;
     }
 
     public Book creatingNewBook(Book book) {
@@ -72,6 +79,7 @@ public class BookService {
         Book bookDelete = bookRepository.findBookByIsbn(isbn);
         if (bookDelete != null) {
             try {
+
                 bookRepository.delete(bookDelete);
                 log.info("book is succesfully deleted");
                 return true;
@@ -81,5 +89,39 @@ public class BookService {
             }
         }
         return false;
+    }
+
+    public boolean addBookToMyBookList(Book book, Principal principal) {
+        Book bookDB = bookRepository.findBookByIsbn(book.getIsbn());
+
+        //Check if book is not null and book is not already in the booklist
+        if (bookDB !=null && bookIsAlreadyInMyBookList(bookDB, principal)) {
+                return true;
+            }
+            return false;
+        }
+
+
+
+    public boolean bookIsAlreadyInMyBookList(Book book,Principal principal ) {
+        Profile profileTemp = getProfileFromPrincipal(principal);
+        List<Book> bookList = profileTemp.getBookList();
+        log.debug(bookList.toString());
+
+        // if book already exist in the booklist return false
+        for (Book bookItem : bookList) {
+            if (bookItem.equals(book))
+                return false;
+        }
+        //save book to booklist
+        profileTemp.addBookToBookList(book);
+        profileRepository.save(profileTemp);
+        return true;
+    }
+
+    public Profile getProfileFromPrincipal(Principal principal) {
+        Account account = accountRepository.findAccountByEmail(principal.getName());
+        Profile profile = profileRepository.findProfileByName(account.getProfile().getName());
+        return profile;
     }
 }

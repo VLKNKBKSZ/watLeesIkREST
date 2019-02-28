@@ -3,23 +3,24 @@ package nl.watleesik.controller;
 import java.security.Principal;
 import java.time.LocalDateTime;
 
+import nl.watleesik.domain.Book;
+import nl.watleesik.repository.BookRepository;
+import nl.watleesik.service.BookService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import nl.watleesik.api.ApiResponse;
 import nl.watleesik.domain.Account;
 import nl.watleesik.domain.Profile;
 import nl.watleesik.repository.AccountRepository;
 import nl.watleesik.repository.ProfileRepository;
+
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "profile")
@@ -28,10 +29,16 @@ public class ProfileController {
 	
 	private final ProfileRepository profileRepository;
 	private final AccountRepository accountRepository;
+	private final BookRepository bookRepository;
+	private final BookService bookService;
 
-	public ProfileController(ProfileRepository profileRepository, AccountRepository accountRepository) {
+	@Autowired
+	public ProfileController(ProfileRepository profileRepository, AccountRepository accountRepository, BookRepository bookRepository,
+							 BookService bookService) {
 		this.profileRepository = profileRepository;
 		this.accountRepository = accountRepository;
+		this.bookRepository	= bookRepository;
+		this.bookService = bookService;
 	}
 
 	@GetMapping
@@ -48,4 +55,16 @@ public class ProfileController {
 		ApiResponse<?> response = new ApiResponse<Profile>(200, "Profiel is aangepast", updatedProfile);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+
+	@PostMapping("/boekenlijst")
+	public ResponseEntity<ApiResponse> addBookToMyBookList(@RequestBody Book book, Principal principal) {
+		boolean saveBookToMyBookList = bookService.addBookToMyBookList(book, principal);
+		if (saveBookToMyBookList) {
+
+			return new ResponseEntity<>(new ApiResponse(409, "Boek is toegevoegd aan boekenlijst", null), HttpStatus.OK);
+		}
+		return new ResponseEntity<>(new ApiResponse(409, "Het boek dat je wil toevoegen bestaat niet, of is al toegevoegd.", null), HttpStatus.CONFLICT);
+	}
+
+
 }
