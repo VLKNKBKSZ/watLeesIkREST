@@ -13,14 +13,14 @@ import nl.watleesik.repository.AddressRepository;
 import nl.watleesik.repository.ProfileRepository;
 
 @Service
-public class RegistrationService {
+public class AccountService {
 
 	private final ProfileRepository profileRepository;
 	private final AddressRepository addressRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final AccountRepository accountRepository;
 
-	public RegistrationService(ProfileRepository profileRepository, AddressRepository addressRepository,
+	public AccountService(ProfileRepository profileRepository, AddressRepository addressRepository,
 			PasswordEncoder passwordEncoder, AccountRepository accountRepository) {
 		this.profileRepository = profileRepository;
 		this.addressRepository = addressRepository;

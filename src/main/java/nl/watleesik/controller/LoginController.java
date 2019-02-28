@@ -21,7 +21,7 @@ import nl.watleesik.domain.Account;
 import nl.watleesik.domain.Profile;
 import nl.watleesik.repository.AccountRepository;
 import nl.watleesik.security.JWTTokenProvider;
-import nl.watleesik.service.RegistrationService;
+import nl.watleesik.service.AccountService;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -32,15 +32,15 @@ public class LoginController {
 	private final AuthenticationManager authenticationManager;
 	private final JWTTokenProvider jwtTokenProvider;
 	private final AccountRepository accountRepository;
-	private final RegistrationService registrationService;
+	private final AccountService accountService;
 
 	@Autowired
 	public LoginController(AuthenticationManager authenticationManager, JWTTokenProvider jwtTokenProvider,
-			AccountRepository accountRepository, RegistrationService registrationService) {
+			AccountRepository accountRepository, AccountService accountService) {
 		this.authenticationManager = authenticationManager;
 		this.jwtTokenProvider = jwtTokenProvider;
 		this.accountRepository = accountRepository;
-		this.registrationService = registrationService;
+		this.accountService = accountService;
 	}
 
 	@PostMapping("/login")
@@ -69,7 +69,7 @@ public class LoginController {
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
 		}
 		
-		Account savedAccount = registrationService.register(account);
+		Account savedAccount = accountService.register(account);
 		response = new ApiResponse<Profile>(200, "Account succesvol geregistreerd", savedAccount.getProfile());
 		return new ResponseEntity<>(response, HttpStatus.OK);
 

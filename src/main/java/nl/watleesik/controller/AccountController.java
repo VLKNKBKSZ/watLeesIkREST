@@ -16,7 +16,7 @@ import nl.watleesik.api.ApiResponse;
 import nl.watleesik.domain.Account;
 import nl.watleesik.domain.Profile;
 import nl.watleesik.repository.AccountRepository;
-import nl.watleesik.service.RegistrationService;
+import nl.watleesik.service.AccountService;
 
 @RestController
 @RequestMapping(path = "account")
@@ -24,11 +24,11 @@ import nl.watleesik.service.RegistrationService;
 public class AccountController {
 
 	private final AccountRepository accountRepository;
-	private final RegistrationService registrationService;
+	private final AccountService accountService;
 	
-	public AccountController(AccountRepository accountRepository, RegistrationService registrationService) {
+	public AccountController(AccountRepository accountRepository, AccountService accountService) {
 		this.accountRepository = accountRepository;
-		this.registrationService = registrationService;
+		this.accountService = accountService;
 	}
 
 	@GetMapping("/list")
@@ -43,7 +43,7 @@ public class AccountController {
 			response = new ApiResponse<>(409, "Emailadres bestaat al", null);
 			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
 		}
-		Account createdAccount = registrationService.register(account);
+		Account createdAccount = accountService.register(account);
 		response = new ApiResponse<Profile>(200, "Account succesvol gecreeerd", createdAccount.getProfile());
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
@@ -51,7 +51,7 @@ public class AccountController {
 	@PostMapping("/delete")
 	public ResponseEntity<ApiResponse<?>> deleteAccount(@RequestBody Account account) {
 		ApiResponse<?> response;
-		if (registrationService.deleteAccount(account)) {
+		if (accountService.deleteAccount(account)) {
 			response = new ApiResponse<>(200, "Account succesvol verwijderd", null);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} else {
