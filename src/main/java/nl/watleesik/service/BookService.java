@@ -2,15 +2,13 @@ package nl.watleesik.service;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.watleesik.domain.*;
-import nl.watleesik.repository.AccountRepository;
-import nl.watleesik.repository.BookCategoryRepository;
-import nl.watleesik.repository.BookRepository;
-import nl.watleesik.repository.ProfileRepository;
+import nl.watleesik.repository.*;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Slf4j
@@ -22,18 +20,21 @@ public class BookService {
     private BookRepository bookRepository;
     private ProfileRepository profileRepository;
     private AccountRepository accountRepository;
+    private ProfileBookRepository profileBookRepository;
 
     @Autowired
     public BookService(BookCategoryRepository bookCategoryRepository,
                        AuthorService authorService,
                        BookRepository bookRepository,
                        ProfileRepository profileRepository,
-                       AccountRepository accountRepository) {
+                       AccountRepository accountRepository,
+                       ProfileBookRepository profileBookRepository) {
         this.authorService = authorService;
         this.bookCategoryRepository = bookCategoryRepository;
         this.bookRepository = bookRepository;
         this.profileRepository = profileRepository;
         this.accountRepository = accountRepository;
+        this.profileBookRepository = profileBookRepository;
     }
 
     public Book creatingNewBook(Book book) {
@@ -95,33 +96,54 @@ public class BookService {
         Book bookDB = bookRepository.findBookByIsbn(book.getIsbn());
 
         //Check if book is not null and book is not already in the booklist
-        if (bookDB !=null && bookIsAlreadyInMyBookList(bookDB, principal)) {
-                return true;
-            }
-            return false;
+        if (bookDB != null && bookIsAlreadyInMyBookList(bookDB, principal)) {
+            return true;
         }
+        return false;
+    }
 
 
-
-    public boolean bookIsAlreadyInMyBookList(Book book,Principal principal ) {
+    public boolean bookIsAlreadyInMyBookList(Book book, Principal principal) {
         Profile profileTemp = getProfileFromPrincipal(principal);
-        List<Book> bookList = profileTemp.getBookList();
+        List<ProfileBook> bookList = profileTemp.getBookList();
         log.debug(bookList.toString());
 
         // if book already exist in the booklist return false
-        for (Book bookItem : bookList) {
-            if (bookItem.equals(book))
+        for (ProfileBook bookItem : bookList) {
+            if (bookItem.getBook().equals(book))
                 return false;
         }
-        //save book to booklist
-        profileTemp.addBookToBookList(book);
+        //save book to ProfileBookList
+
+        profileTemp.addProfileBookToBookList(createProfileBook(profileTemp, book));
         profileRepository.save(profileTemp);
         return true;
+    }
+
+    public ProfileBook createProfileBook(Profile profile, Book book) {
+        ProfileBook profileBookNew = new ProfileBook();
+        profileBookNew.setProfile(profile);
+        profileBookNew.setBook(book);
+        profileBookNew.setAddedOn(LocalDate.now());
+        return profileBookRepository.save(profileBookNew);
+
+
     }
 
     public Profile getProfileFromPrincipal(Principal principal) {
         Account account = accountRepository.findAccountByEmail(principal.getName());
         Profile profile = profileRepository.findProfileByName(account.getProfile().getName());
         return profile;
+    }
+
+    public boolean deleteBookFromBookList(ProfileBook profileBook) {
+
+        try {
+            profileBookRepository.delete(profileBookRepository.findById(profileBook.getId()));
+            return true;
+        } catch (HibernateException ex) {
+            log.debug(ex.getMessage());
+            return false;
+        }
     }
 }

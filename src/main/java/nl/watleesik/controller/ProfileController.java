@@ -2,16 +2,11 @@ package nl.watleesik.controller;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
-
-import nl.watleesik.domain.Book;
 import nl.watleesik.repository.BookRepository;
 import nl.watleesik.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import nl.watleesik.api.ApiResponse;
@@ -19,8 +14,6 @@ import nl.watleesik.domain.Account;
 import nl.watleesik.domain.Profile;
 import nl.watleesik.repository.AccountRepository;
 import nl.watleesik.repository.ProfileRepository;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(path = "profile")
@@ -56,15 +49,9 @@ public class ProfileController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	@PostMapping("/boekenlijst")
-	public ResponseEntity<ApiResponse> addBookToMyBookList(@RequestBody Book book, Principal principal) {
-		boolean saveBookToMyBookList = bookService.addBookToMyBookList(book, principal);
-		if (saveBookToMyBookList) {
 
-			return new ResponseEntity<>(new ApiResponse(409, "Boek is toegevoegd aan boekenlijst", null), HttpStatus.OK);
-		}
-		return new ResponseEntity<>(new ApiResponse(409, "Het boek dat je wil toevoegen bestaat niet, of is al toegevoegd.", null), HttpStatus.CONFLICT);
-	}
+
+
 
 
 }

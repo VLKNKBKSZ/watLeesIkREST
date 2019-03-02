@@ -1,5 +1,7 @@
 package nl.watleesik.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -30,14 +32,13 @@ public class Profile {
     private String middleName;
     private String lastName;
     private LocalDateTime updatedOn;
-    
-    @ManyToMany
-    @JoinTable(name = "person_book", joinColumns = @JoinColumn(name =
-            "person_id"), inverseJoinColumns = @JoinColumn(name = "book_id"))
-    private List<Book> bookList;
 
-    public void addBookToBookList(Book book) {
-        this.bookList.add(book);
+    @JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "profile")
+    private List<ProfileBook> bookList;
+
+    public void addProfileBookToBookList(ProfileBook profileBook) {
+        bookList.add(profileBook);
     }
 
 }
