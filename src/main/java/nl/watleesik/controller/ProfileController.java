@@ -36,7 +36,8 @@ public class ProfileController {
 
 	@GetMapping
 	public ResponseEntity<ApiResponse<?>> findProfileById(Principal principal) {
-		Account account = accountRepository.findAccountByEmail(principal.getName());
+		// TODO: HK Adjust for optional
+		Account account = accountRepository.findAccountByEmail(principal.getName()).get();
 		ApiResponse<?> response = new ApiResponse<Profile>(200, "Profiel is opgehaald", account.getProfile());
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}

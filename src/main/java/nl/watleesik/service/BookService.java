@@ -131,7 +131,8 @@ public class BookService {
     }
 
     public Profile getProfileFromPrincipal(Principal principal) {
-        Account account = accountRepository.findAccountByEmail(principal.getName());
+    	// TODO: Adjust for optional
+        Account account = accountRepository.findAccountByEmail(principal.getName()).get();
         Profile profile = profileRepository.findProfileByName(account.getProfile().getName());
         return profile;
     }

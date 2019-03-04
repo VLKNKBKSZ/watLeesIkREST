@@ -23,6 +23,12 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
     @Value("${security.registerUrl}")
     private String registerUrl;
+    
+    @Value("${security.forgotPasswordUrl}")
+    private String forgotPasswordUrl;
+    
+    @Value("${security.resetPasswordUrl}")
+    private String resetPasswordUrl;
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JWTAuthenticationEntryPoint jwtAuthenticationEntryPoint;
@@ -49,6 +55,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(signUpUrl).permitAll()
                 .antMatchers(registerUrl).permitAll()
+                .antMatchers(forgotPasswordUrl).permitAll()
+                .antMatchers(resetPasswordUrl).permitAll()
                 .antMatchers("/book/**").hasRole("USER")
                 .antMatchers("/account/**").hasRole("ADMIN")
                 .anyRequest().authenticated()

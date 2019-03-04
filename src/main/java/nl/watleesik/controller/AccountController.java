@@ -34,7 +34,7 @@ public class AccountController {
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<?>> createAccount(@RequestBody Account account) {
         ApiResponse<?> response;
-        if (accountRepository.findAccountByEmail(account.getEmail()) != null) {
+        if (accountRepository.findAccountByEmail(account.getEmail()).isPresent()) {
             response = new ApiResponse<>(409, "Emailadres bestaat al", null);
             return new ResponseEntity<>(response, HttpStatus.CONFLICT);
         }
