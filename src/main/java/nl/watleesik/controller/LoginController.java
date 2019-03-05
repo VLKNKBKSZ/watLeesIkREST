@@ -53,27 +53,22 @@ public class LoginController implements IApiResponse {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<JWTAuthenticationResponse> authenticateAccount(@RequestBody Account account) {
+	public ApiResponse<JWTAuthenticationResponse> authenticateAccount(@RequestBody Account account) {
 
 		Authentication authentication = authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(account.getEmail(), account.getPassword()));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		String token = jwtTokenProvider.generateToken(authentication);
-		Optional<Account> optionalAccount = accountRepository.findAccountByEmail(account.getEmail());
-		if (optionalAccount.isPresent()) {
-			Account authenticatedAccount = optionalAccount.get();
-			JWTAuthenticationResponse jwtResponse = new JWTAuthenticationResponse(
-					token,
-					authenticatedAccount.getEmail(),
-					authenticatedAccount.getRole());
-			authenticatedAccount.setLastLogin(LocalDateTime.now());
-			accountRepository.save(authenticatedAccount);
-			return new ResponseEntity<>(jwtResponse, HttpStatus.OK);
-		} else {
-			// TODO: check how to handle this situation (if it ever occures)
-			return null;
-		} 		
+		Account authenticatedAccount = accountRepository.findAccountByEmail(account.getEmail()).get();
+		
+		JWTAuthenticationResponse jwtResponse = new JWTAuthenticationResponse(
+				token,
+				authenticatedAccount.getEmail(),
+				authenticatedAccount.getRole());
+		authenticatedAccount.setLastLogin(LocalDateTime.now());
+		accountRepository.save(authenticatedAccount);
+		return createResponse(200, "Authenticatie succesvol", jwtResponse);
 	}
 
 	@PostMapping("/account/register")
