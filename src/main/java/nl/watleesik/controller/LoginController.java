@@ -21,6 +21,11 @@ import nl.watleesik.api.JWTAuthenticationResponse;
 import nl.watleesik.api.ResetRequest;
 import nl.watleesik.domain.Account;
 import nl.watleesik.domain.PasswordResetToken;
+import nl.watleesik.domain.Profile;
+import nl.watleesik.exceptions.EmailAlreadyInUseException;
+import nl.watleesik.exceptions.EmailNotFoundException;
+import nl.watleesik.exceptions.ResetTokenExpiredException;
+import nl.watleesik.exceptions.ResetTokenInvalidException;
 import nl.watleesik.repository.AccountRepository;
 import nl.watleesik.repository.PasswordResetTokenRepository;
 import nl.watleesik.security.JWTTokenProvider;
@@ -28,9 +33,7 @@ import nl.watleesik.service.AccountService;
 
 @RestController
 @CrossOrigin(origins = "*")
-public class LoginController {
-
-	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
+public class LoginController implements IApiResponse {
 
 	private final AuthenticationManager authenticationManager;
 	private final JWTTokenProvider jwtTokenProvider;
@@ -70,51 +73,40 @@ public class LoginController {
 		} else {
 			// TODO: check how to handle this situation (if it ever occures)
 			return null;
-		} 
-		
+		} 		
 	}
 
 	@PostMapping("/account/register")
-	public ResponseEntity<ApiResponse<?>> register(@RequestBody Account account) {
+	public ApiResponse<Profile> register(@RequestBody Account account) throws EmailAlreadyInUseException {
+		
 		if (accountRepository.findAccountByEmail(account.getEmail()).isPresent()) {
-			return createResponse(409, "Emailadres bestaat al", HttpStatus.CONFLICT);
+			throw new EmailAlreadyInUseException();
 		}
 		
 		Account savedAccount = accountService.register(account);
-		return createResponse(200, "Account succesvol geregistreerd", savedAccount.getProfile(), HttpStatus.OK);
+		return createResponse(200, "Account succesvol geregistreerd", savedAccount.getProfile());
 	}
 	
 	@PostMapping("/account/forgot")
-	public ResponseEntity<ApiResponse<?>> forgotPassword(@RequestBody String email) {
+	public ApiResponse<?> forgotPassword(@RequestBody String email) throws EmailNotFoundException {
 		Optional<Account> optionalAccount = accountRepository.findAccountByEmail(email);
 		if (!optionalAccount.isPresent()) {
-			return createResponse(404, "Emailadres niet gevonden", HttpStatus.NOT_FOUND);
+			throw new EmailNotFoundException();
 		}
 		accountService.sendResetPasswordMail(optionalAccount.get());
-		return createResponse(200, "Password reset link sent to email", HttpStatus.OK);	
+		return createResponse(200, "Password reset link sent to email");	
 	}
 	
 	@PostMapping("account/reset")
-	public ResponseEntity<ApiResponse<?>> resetPassword(@RequestBody ResetRequest resetRequest) {
+	public ApiResponse<?> resetPassword(@RequestBody ResetRequest resetRequest) 
+			throws ResetTokenExpiredException, ResetTokenInvalidException {
 		Optional<PasswordResetToken> token = passwordResetTokenRepository.findByToken(resetRequest.getToken());
 		if (token.isPresent()) {
-			if (token.get().isExpired()) {
-				return createResponse(403, "Reset token is verlopen", HttpStatus.FORBIDDEN);
-			}
+			if (token.get().isExpired()) throw new ResetTokenExpiredException();
 			if (accountService.processPasswordReset(token.get(), resetRequest.getPassword())) {
-				return createResponse(200, "Wachtwoord is gewijzigd", HttpStatus.OK);
+				return createResponse(200, "Wachtwoord is gewijzigd");
 			}
 		} 
-		return createResponse(403, "Ongeldig token", HttpStatus.FORBIDDEN);
-		
-	}
-	
-	private <T> ResponseEntity<ApiResponse<?>> createResponse(int statusCode, String message, T object, HttpStatus httpStatus) {
-		ApiResponse<T> response = new ApiResponse<T>(statusCode, message, object);
-		return new ResponseEntity<>(response, httpStatus);
-	}
-	
-	private <T> ResponseEntity<ApiResponse<?>> createResponse(int statusCode, String message, HttpStatus httpStatus) {
-		return createResponse(statusCode, message, null, httpStatus);
+		throw new ResetTokenInvalidException();
 	}
 }
