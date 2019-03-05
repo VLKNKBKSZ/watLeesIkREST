@@ -37,8 +37,19 @@ public class BookService {
         this.profileBookRepository = profileBookRepository;
     }
 
+    // loops true the booklist to see if the author already has that book saved
+    public boolean checkIfBookExists(Book book) {
+        return bookRepository.findBookByTitle(book.getTitle())
+                .stream()
+                .filter(b -> b.getAuthor().equals(book.getAuthor()))
+                .count() != 0;
+    }
+
     public Book creatingNewBook(Book book) {
 
+        if (checkIfBookExists(book)) {
+            return null;
+        }
         Book newBook = new Book();
 
         Author authorDB = authorService.createAuthor(book.getAuthor());
@@ -46,18 +57,6 @@ public class BookService {
 
         BookCategory bookCategoryDB = creatingNewCategory(book.getBookCategory());
         newBook.setBookCategory(bookCategoryDB);
-
-        List<Book> bookListDB = bookRepository.findBookByTitle(book.getTitle());
-
-        // loops true the booklist to see if the author already has that book saved
-        if (!bookListDB.isEmpty()) {
-            for (Book bookList : bookListDB) {
-                if (bookList.getAuthor().equals(authorDB)) {
-                    return null;
-                }
-            }
-
-        }
 
         newBook.setTitle(book.getTitle());
         newBook.setPublicationYear(book.getPublicationYear());
@@ -131,9 +130,8 @@ public class BookService {
     }
 
     public Profile getProfileFromPrincipal(Principal principal) {
-    	// TODO: Adjust for optional
-        Account account = accountRepository.findAccountByEmail(principal.getName()).get();
-        Profile profile = profileRepository.findProfileByName(account.getProfile().getName());
+        // TODO: Adjust for optional
+        Profile profile = accountRepository.findAccountByEmail(principal.getName()).get().getProfile();
         return profile;
     }
 
