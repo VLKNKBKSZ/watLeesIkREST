@@ -3,6 +3,8 @@ package nl.watleesik.controller;
 import nl.watleesik.api.ApiResponse;
 import nl.watleesik.domain.Account;
 import nl.watleesik.domain.Profile;
+import nl.watleesik.exceptions.AccountNotDeletedException;
+import nl.watleesik.exceptions.EmailAlreadyInUseException;
 import nl.watleesik.repository.AccountRepository;
 import nl.watleesik.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "account")
 @CrossOrigin(origins = "*")
-public class AccountController {
+public class AccountController implements IApiResponse {
 
     private final AccountRepository accountRepository;
     private final AccountService accountService;
@@ -27,31 +29,25 @@ public class AccountController {
     }
 
     @GetMapping("/list")
-    public ResponseEntity<List<Account>> getAccountList() {
-        return new ResponseEntity<>(accountRepository.findAll(), HttpStatus.OK);
+    public ApiResponse<List<Account>> getAccountList() {
+    	return createResponse(200, "Accountlijst succesvol opgehaald", accountRepository.findAll());
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<?>> createAccount(@RequestBody Account account) {
-        ApiResponse<?> response;
+    public ApiResponse<Profile> createAccount(@RequestBody Account account) throws EmailAlreadyInUseException {
         if (accountRepository.findAccountByEmail(account.getEmail()).isPresent()) {
-            response = new ApiResponse<>(409, "Emailadres bestaat al", null);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            throw new EmailAlreadyInUseException();
         }
         Account createdAccount = accountService.register(account);
-        response = new ApiResponse<Profile>(200, "Account succesvol gecreeerd", createdAccount.getProfile());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return createResponse(200, "Account succesvol gecreeerd", createdAccount.getProfile());
     }
 
     @PostMapping("/delete")
-    public ResponseEntity<ApiResponse<?>> deleteAccount(@RequestBody Account account) {
-        ApiResponse<?> response;
+    public ApiResponse<?> deleteAccount(@RequestBody Account account) throws AccountNotDeletedException {
         if (accountService.deleteAccount(account)) {
-            response = new ApiResponse<>(200, "Account succesvol verwijderd", null);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return createResponse(200, "Account succesvol verwijderd");
         } else {
-            response = new ApiResponse<>(409, "Kon account niet verwijderen", null);
-            return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+            throw new AccountNotDeletedException();
         }
     }
 }

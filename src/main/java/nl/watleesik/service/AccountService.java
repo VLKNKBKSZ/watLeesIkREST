@@ -3,11 +3,13 @@ package nl.watleesik.service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import javax.persistence.EntityNotFoundException;
+
+import org.hibernate.HibernateException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import nl.watleesik.api.ResetRequest;
 import nl.watleesik.domain.Account;
 import nl.watleesik.domain.Address;
 import nl.watleesik.domain.Mail;
@@ -58,12 +60,16 @@ public class AccountService {
 	}
 	
 	public boolean deleteAccount(Account account) {
-		if (account != null) {
-			accountRepository.delete(account);
-			profileRepository.delete(account.getProfile());
-			addressRepository.delete(account.getProfile().getAddress());			
-			return true;
-		} else return false;		
+		try {
+			if (account != null) {
+				accountRepository.delete(account);
+				profileRepository.delete(account.getProfile());
+				addressRepository.delete(account.getProfile().getAddress());			
+			}
+		} catch (Exception ex) {
+			log.debug("Could not delete account: {}. Exception message: {}", account, ex.getMessage());
+		}
+		return accountRepository.findAccountByEmail(account.getEmail()).isEmpty();
 	}
 	
 	public void sendResetPasswordMail(Account account) {
