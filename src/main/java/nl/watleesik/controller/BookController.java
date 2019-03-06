@@ -6,6 +6,7 @@ import nl.watleesik.domain.Book;
 import nl.watleesik.domain.BookCategory;
 import nl.watleesik.domain.Profile;
 import nl.watleesik.domain.ProfileBook;
+import nl.watleesik.exceptions.RatingNotUpdatedForBookListItem;
 import nl.watleesik.repository.BookCategoryRepository;
 import nl.watleesik.repository.BookRepository;
 import nl.watleesik.repository.ProfileBookRepository;
@@ -22,7 +23,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "book")
 @Slf4j
-public class BookController {
+public class BookController  implements IApiResponse{
 
     private BookCategoryRepository bookCategoryRepository;
     private BookService bookService;
@@ -92,5 +93,14 @@ public class BookController {
            return new ResponseEntity<>(new ApiResponse(200, "", null), HttpStatus.OK);
        }
         return new ResponseEntity<>(new ApiResponse(409, "Boek is niet verwijderd van boeklijst!", null), HttpStatus.CONFLICT);
+    }
+
+    @PutMapping("/mybooklist/addrating")
+    public ApiResponse<?> addRatingToProfileBookItem(@RequestBody ProfileBook profileBook) throws RatingNotUpdatedForBookListItem {
+        boolean isSuccesfull = bookService.addRatingToProfileBookItem(profileBook);
+        if(isSuccesfull) {
+            return createResponse(200 , "Rating is succesvol toegevoegd");
+        }
+     throw new RatingNotUpdatedForBookListItem();
     }
 }

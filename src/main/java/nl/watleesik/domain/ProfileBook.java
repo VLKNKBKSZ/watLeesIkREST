@@ -27,7 +27,7 @@ public class ProfileBook {
     @OneToOne
     private Book book;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
     private Rating rating;
 
     private LocalDate addedOn;

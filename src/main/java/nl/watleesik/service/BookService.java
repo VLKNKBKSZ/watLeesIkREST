@@ -2,6 +2,7 @@ package nl.watleesik.service;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.watleesik.domain.*;
+import nl.watleesik.exceptions.RatingNotUpdatedForBookListItem;
 import nl.watleesik.repository.*;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ public class BookService {
     private ProfileRepository profileRepository;
     private AccountRepository accountRepository;
     private ProfileBookRepository profileBookRepository;
+    private RatingRepository ratingRepository;
 
     @Autowired
     public BookService(BookCategoryRepository bookCategoryRepository,
@@ -28,13 +30,15 @@ public class BookService {
                        BookRepository bookRepository,
                        ProfileRepository profileRepository,
                        AccountRepository accountRepository,
-                       ProfileBookRepository profileBookRepository) {
+                       ProfileBookRepository profileBookRepository,
+                       RatingRepository ratingRepository) {
         this.authorService = authorService;
         this.bookCategoryRepository = bookCategoryRepository;
         this.bookRepository = bookRepository;
         this.profileRepository = profileRepository;
         this.accountRepository = accountRepository;
         this.profileBookRepository = profileBookRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     // loops true the booklist to see if the author already has that book saved
@@ -144,5 +148,17 @@ public class BookService {
             log.debug(ex.getMessage());
             return false;
         }
+    }
+
+    public boolean addRatingToProfileBookItem(ProfileBook profileBook) {
+        ProfileBook profileBook1 = profileBookRepository.findById(profileBook.getId());
+        if (profileBook1 != null) {
+            profileBook1.setFinishedOn(LocalDate.now());
+            profileBook1.setRating(ratingRepository.save(profileBook.getRating()));
+            profileBookRepository.save(profileBook1);
+            log.info(profileBook1.toString() + " waardering is toegevoegd");
+            return true;
+        }
+        return false;
     }
 }
