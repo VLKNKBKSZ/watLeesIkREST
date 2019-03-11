@@ -20,13 +20,13 @@ public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    
-//    @OneToMany
+
+    //    @OneToMany
 //    @JoinColumn(name = "address_id")
 //    private List<Address> addressList;
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     Address address;
-    
+
     private LocalDate dayOfBirth;
     private String name;
     private String middleName;
@@ -34,7 +34,7 @@ public class Profile {
     private LocalDateTime updatedOn;
 
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "profile")
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "profile")
     private List<ProfileBook> bookList;
 
     public void addProfileBookToBookList(ProfileBook profileBook) {

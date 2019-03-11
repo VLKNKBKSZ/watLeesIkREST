@@ -7,6 +7,7 @@ import nl.watleesik.repository.*;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -44,9 +45,7 @@ public class BookService {
     // loops true the booklist to see if the author already has that book saved
     public boolean checkIfBookExists(Book book) {
         return bookRepository.findBookByTitle(book.getTitle())
-                .stream()
-                .filter(b -> b.getAuthor().equals(book.getAuthor()))
-                .count() != 0;
+                .stream().anyMatch(b -> b.getAuthor().equals(book.getAuthor()));
     }
 
     public Book creatingNewBook(Book book) {
@@ -85,7 +84,7 @@ public class BookService {
             try {
 
                 bookRepository.delete(bookDelete);
-                log.info("book is succesfully deleted");
+                log.debug("book is succesfully deleted");
                 return true;
             } catch (HibernateException ex) {
                 log.warn(ex.getMessage(), "Something went wrong while deleting a book");
@@ -134,9 +133,7 @@ public class BookService {
     }
 
     public Profile getProfileFromPrincipal(Principal principal) {
-        // TODO: Adjust for optional
-        Profile profile = accountRepository.findAccountByEmail(principal.getName()).get().getProfile();
-        return profile;
+        return accountRepository.findAccountByEmail(principal.getName()).get().getProfile();
     }
 
     public boolean deleteBookFromBookList(ProfileBook profileBook) {
@@ -156,7 +153,7 @@ public class BookService {
             profileBook1.setFinishedOn(LocalDate.now());
             profileBook1.setRating(ratingRepository.save(profileBook.getRating()));
             profileBookRepository.save(profileBook1);
-            log.info(profileBook1.toString() + " waardering is toegevoegd");
+            log.info("Waardering is toegevoedgd", profileBook1.toString());
             return true;
         }
         return false;

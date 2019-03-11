@@ -1,3 +1,4 @@
+
 package nl.watleesik.domain;
 
 import java.time.LocalDateTime;
@@ -17,25 +18,25 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class PasswordResetToken {
-	
+
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-	
+
 	@Column(nullable = false, unique = true)
 	private String token;
-	
+
 	@OneToOne
 	@JoinColumn(nullable = false, name = "profile_id")
 	private Account account;
-	
+
 	@Column(nullable = false)
 	private LocalDateTime expireDate;
-	
+
 	public void setExpireTime(long minutes) {
 		expireDate = LocalDateTime.now().plusMinutes(minutes);
 	}
-	
+
 	public boolean isExpired() {
 		return LocalDateTime.now().isAfter(expireDate);
 	}

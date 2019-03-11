@@ -14,7 +14,7 @@ public class Author {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @EqualsAndHashCode.Exclude
     private long id;
-    
+
     private String name;
     private String middleName;
     private String lastName;

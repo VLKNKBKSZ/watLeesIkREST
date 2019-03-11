@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class AuthorService {
 
-    AuthorRepository authorRepository;
+    private AuthorRepository authorRepository;
 
     @Autowired
     public AuthorService(AuthorRepository authorRepository) {
@@ -20,7 +20,7 @@ public class AuthorService {
 
         Author authorDB = authorRepository.findAuthorByLastNameAndName(author.getLastName(), author.getName());
 
-        if (authorDB != null && (authorDB.equals(author))) {
+        if ((author.equals(authorDB))) {
 
             return authorDB;
         }

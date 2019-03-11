@@ -20,57 +20,57 @@ import java.util.List;
 @NoArgsConstructor
 public class Account implements UserDetails {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-	@Column(unique = true, nullable = false)
-	private String email;
-	
-	@OneToOne
-	@MapsId
-	private Profile profile;
-	
-	@Column(length = 100)
-	private String password;
-	
-	@Enumerated(EnumType.STRING)
-	@Column(length = 15, nullable = false)
-	private AccountRole role = AccountRole.USER;
-	
-	private LocalDateTime createdOn;
-	private LocalDateTime updatedOn;
-	private LocalDateTime lastLogin;
+    @Column(unique = true, nullable = false)
+    private String email;
 
-	@JsonIgnore
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		List<GrantedAuthority> authority = new ArrayList<>();
-		authority.add(new SimpleGrantedAuthority("ROLE_" + role));
-		return authority;		
-	}
+    @OneToOne
+    @MapsId
+    private Profile profile;
+
+    @Column(length = 100)
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 15, nullable = false)
+    private AccountRole role = AccountRole.USER;
+
+    private LocalDateTime createdOn;
+    private LocalDateTime updatedOn;
+    private LocalDateTime lastLogin;
+
+    @JsonIgnore
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<GrantedAuthority> authority = new ArrayList<>();
+        authority.add(new SimpleGrantedAuthority("ROLE_" + role));
+        return authority;
+    }
 
 
-	public String getUsername() {
-		return email;
-	}
+    public String getUsername() {
+        return email;
+    }
 
-	public boolean isAccountNonExpired() {
-		// TODO: implement account expired
-		return true;
-	}
+    public boolean isAccountNonExpired() {
+        // TODO: implement account expired
+        return true;
+    }
 
-	public boolean isAccountNonLocked() {
-		// TODO: implement account locking
-		return true;
-	}
+    public boolean isAccountNonLocked() {
+        // TODO: implement account locking
+        return true;
+    }
 
-	public boolean isCredentialsNonExpired() {
-		// TODO: implement password expiring
-		return true;
-	}
+    public boolean isCredentialsNonExpired() {
+        // TODO: implement password expiring
+        return true;
+    }
 
-	public boolean isEnabled() {
-		// TODO: implement disable account
-		return true;
-	}
+    public boolean isEnabled() {
+        // TODO: implement disable account
+        return true;
+    }
 }

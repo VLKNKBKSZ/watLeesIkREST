@@ -15,20 +15,20 @@ public class Book {
     @EqualsAndHashCode.Exclude
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    
+
     private long isbn;
-    
+
     @ManyToOne
     private BookCategory bookCategory;
-    
+
     @ManyToOne
     @JoinColumn(name = "author_id")
     private Author author;
-    
+
     private String title;
     private int publicationYear;
     private int pages;
-    
+
     @OneToMany
     private List<Rating> ratingList;
 
