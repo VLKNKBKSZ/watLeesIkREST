@@ -2,12 +2,10 @@ package nl.watleesik.service;
 
 import lombok.extern.slf4j.Slf4j;
 import nl.watleesik.domain.*;
-import nl.watleesik.exceptions.RatingNotUpdatedForBookListItem;
 import nl.watleesik.repository.*;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
 import java.time.LocalDate;
@@ -42,7 +40,12 @@ public class BookService {
         this.ratingRepository = ratingRepository;
     }
 
-    // loops true the booklist to see if the author already has that book saved
+    /**
+     * Check if there is a book in the database with the samen author
+     * @param book
+     * @return true if there is anymatch false if there isnt
+     */
+
     public boolean checkIfBookExists(Book book) {
         return bookRepository.findBookByTitle(book.getTitle())
                 .stream().anyMatch(b -> b.getAuthor().equals(book.getAuthor()));
@@ -153,7 +156,7 @@ public class BookService {
             profileBook1.setFinishedOn(LocalDate.now());
             profileBook1.setRating(ratingRepository.save(profileBook.getRating()));
             profileBookRepository.save(profileBook1);
-            log.info("Waardering is toegevoedgd", profileBook1.toString());
+            log.debug("Waardering is toegevoegd", profileBook1.getRating().toString());
             return true;
         }
         return false;

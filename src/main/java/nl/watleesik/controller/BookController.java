@@ -6,7 +6,9 @@ import nl.watleesik.domain.Book;
 import nl.watleesik.domain.BookCategory;
 import nl.watleesik.domain.Profile;
 import nl.watleesik.domain.ProfileBook;
-import nl.watleesik.exceptions.RatingNotUpdatedForBookListItem;
+import nl.watleesik.exceptions.BookAlreadyExistForAuthorException;
+import nl.watleesik.exceptions.BookNotDeletedException;
+import nl.watleesik.exceptions.RatingNotUpdatedForBookListItemException;
 import nl.watleesik.repository.BookCategoryRepository;
 import nl.watleesik.repository.BookRepository;
 import nl.watleesik.repository.ProfileBookRepository;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
@@ -44,12 +47,12 @@ public class BookController  implements IApiResponse{
     }
 
     @DeleteMapping("delete/{isbn}")
-    public ResponseEntity<ApiResponse> deleteBook(@PathVariable("isbn") Long isbn) {
+    public ApiResponse<?> deleteBook(@PathVariable("isbn") Long isbn) throws BookNotDeletedException{
         boolean bookDelete = bookService.deleteBook(isbn);
         if (bookDelete) {
-            return new ResponseEntity<>(new ApiResponse(200, "Boek is succesvol verwijderd", null), HttpStatus.OK);
+            return createResponse(200, "Boek is succesvol verwijderd.");
         }
-        return new ResponseEntity<>(new ApiResponse(409, "Het boek dat je wil verwijderen bestaat niet.", null), HttpStatus.CONFLICT);
+        throw new BookNotDeletedException("Het boek dat je wil verwijderen bestaat niet.");
     }
 
     @GetMapping("/categories")
@@ -59,14 +62,14 @@ public class BookController  implements IApiResponse{
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse> createBook(@RequestBody Book book) {
+    public ApiResponse<?> createBook(@RequestBody Book book) throws BookAlreadyExistForAuthorException {
 
         Book newBook = bookService.creatingNewBook(book);
 
-        if (newBook == null) {
-            return new ResponseEntity<>(new ApiResponse(409, "Het boek dat je wil toevoegen bestaat al voor deze auteur", null), HttpStatus.CONFLICT);
+        if (newBook != null) {
+            return createResponse(200, "Boek is opgeslagen.");
         }
-        return new ResponseEntity<>(new ApiResponse(200, "Er is een nieuw boek toegevoegd aan de database ", newBook), HttpStatus.CREATED);
+       throw new BookAlreadyExistForAuthorException();
     }
 
     @PostMapping("/booklist")
@@ -74,7 +77,7 @@ public class BookController  implements IApiResponse{
         boolean saveBookToMyBookList = bookService.addBookToMyBookList(book, principal);
         if (saveBookToMyBookList) {
 
-            return new ResponseEntity<>(new ApiResponse(409, "Boek is toegevoegd aan boekenlijst", null), HttpStatus.OK);
+            return new ResponseEntity<>(new ApiResponse(200, "Boek is toegevoegd aan boekenlijst.", null), HttpStatus.OK);
         }
         return new ResponseEntity<>(new ApiResponse(409, "Het boek dat je wil toevoegen bestaat niet, of is al toegevoegd.", null), HttpStatus.CONFLICT);
     }
@@ -96,11 +99,11 @@ public class BookController  implements IApiResponse{
     }
 
     @PutMapping("/mybooklist/addrating")
-    public ApiResponse<?> addRatingToProfileBookItem(@RequestBody ProfileBook profileBook) throws RatingNotUpdatedForBookListItem {
+    public ApiResponse<?> addRatingToProfileBookItem(@RequestBody ProfileBook profileBook) throws RatingNotUpdatedForBookListItemException {
         boolean isSuccesfull = bookService.addRatingToProfileBookItem(profileBook);
         if(isSuccesfull) {
             return createResponse(200 , "Rating is succesvol toegevoegd");
         }
-     throw new RatingNotUpdatedForBookListItem();
+     throw new RatingNotUpdatedForBookListItemException();
     }
 }
