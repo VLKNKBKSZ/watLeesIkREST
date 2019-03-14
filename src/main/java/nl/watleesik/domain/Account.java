@@ -41,6 +41,20 @@ public class Account implements UserDetails {
     private LocalDateTime createdOn;
     private LocalDateTime updatedOn;
     private LocalDateTime lastLogin;
+    
+	public Account(long id, String email, Profile profile, String password, AccountRole role) {
+		this.id = id;
+		this.email = email;
+		this.profile = profile;
+		this.password = password;
+		this.role = role;
+	}
+	
+	public Account(long id, String email) {
+		super();
+		this.id = id;
+		this.email = email;
+	}	
 
     @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {

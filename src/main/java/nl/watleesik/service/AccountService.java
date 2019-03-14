@@ -78,7 +78,7 @@ public class AccountService {
 		token.setAccount(account);
 		token.setExpireTime(30);
 		passwordResetTokenRepository.save(token);
-		String resetUrl = "http://localhost:4200/" + "/reset-password/" + token.getToken();
+		String resetUrl = "http://localhost:4200/reset-password/" + token.getToken();
 		emailService.sendSimpleMessage(createNewPasswordMail(account, resetUrl));
 		log.debug("token: {}", token);
 	}

@@ -3,6 +3,7 @@ package nl.watleesik.controller;
 import nl.watleesik.api.ApiResponse;
 import nl.watleesik.domain.Account;
 import nl.watleesik.domain.Profile;
+import nl.watleesik.exceptions.AccountListEmptyException;
 import nl.watleesik.exceptions.AccountNotDeletedException;
 import nl.watleesik.exceptions.EmailAlreadyInUseException;
 import nl.watleesik.repository.AccountRepository;
@@ -29,8 +30,10 @@ public class AccountController implements IApiResponse {
     }
 
     @GetMapping("/list")
-    public ApiResponse<List<Account>> getAccountList() {
-    	return createResponse(200, "Accountlijst succesvol opgehaald", accountRepository.findAll());
+    public ApiResponse<List<Account>> getAccountList() throws AccountListEmptyException {
+    	List<Account> accountList = accountRepository.findAll();
+    	if (accountList.isEmpty()) throw new AccountListEmptyException();
+    	return createResponse(200, "Accountlijst succesvol opgehaald", accountList);
     }
 
     @PostMapping("/create")
